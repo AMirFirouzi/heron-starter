@@ -1,0 +1,12 @@
+# outputs
+##################
+terminal-output.txt
+output.txt
+
+
+# target directory
+#################
+target/
+
+
+.directory
