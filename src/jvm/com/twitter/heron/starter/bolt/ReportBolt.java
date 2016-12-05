@@ -37,7 +37,7 @@ public class ReportBolt extends BaseRichBolt
         //redis = client.connect();
 
       try {
-        writer = new PrintWriter("/home/amir/Projects/git/heron-examples/heron-starter/output.txt", "UTF-8");
+        writer = new PrintWriter("/home/amir/Projects/heron/myheron/heron-starter/output.txt", "UTF-8");
       } catch (FileNotFoundException e) {
         e.printStackTrace();
       } catch (UnsupportedEncodingException e) {

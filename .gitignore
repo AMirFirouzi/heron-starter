@@ -7,6 +7,6 @@ output.txt
 # target directory
 #################
 target/
-
+.idea
 
 .directory

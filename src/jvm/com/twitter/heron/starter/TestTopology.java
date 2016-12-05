@@ -1,5 +1,6 @@
 package com.twitter.heron.starter;
 
+import com.twitter.heron.api.graph.Graph;
 import org.apache.storm.testing.TestWordSpout;
 import com.twitter.heron.starter.bolt.redisReportBolt;
 import com.twitter.heron.starter.spout.BookWordSpout;
@@ -11,7 +12,6 @@ import org.apache.storm.LocalCluster;
 import org.apache.storm.StormSubmitter;
 import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.tuple.Fields;
-import org.apache.storm.Graph;
 
 /**
  * This topology demonstrates how to count distinct words from
@@ -34,21 +34,21 @@ public class TestTopology {
         // create the topology
         TopologyBuilder builder = new TopologyBuilder();
 
-        builder.setSpout("c1s1", new BookWordSpout(), 2);
+        builder.setSpout("s1", new BookWordSpout(), 2);
 
-        builder.setSpout("c2s2", new BookWordSpout(), 2);
+        builder.setSpout("s2", new BookWordSpout(), 2);
 
         // attach the count bolt using fields grouping - parallelism of 15
-        builder.setBolt("c3b1", new CountBolt(), 3)
-                .fieldsGrouping("c1s1", new Fields("word"))
-                .fieldsGrouping("c2s2", new Fields("word"));
+        builder.setBolt("b1", new CountBolt(), 3)
+                .fieldsGrouping("s1", new Fields("word"))
+                .fieldsGrouping("s2", new Fields("word"));
 
-        builder.setBolt("c4b2", new CountBolt(), 3)
-                .fieldsGrouping("c1s1", new Fields("word"));
+        builder.setBolt("b2", new CountBolt(), 3)
+                .fieldsGrouping("s1", new Fields("word"));
 
-        builder.setBolt("c5b3", new ReportBolt(), 3)
-                .globalGrouping("c3b1")
-                .globalGrouping("c4b2");
+        builder.setBolt("b3", new ReportBolt(), 3)
+                .globalGrouping("b1")
+                .globalGrouping("b2");
 
         // create the default config object
         Config conf = new Config();
@@ -78,7 +78,7 @@ public class TestTopology {
 
             //**********************************************************************
             // let the topology run for 30 seconds. note topologies never terminate!
-            Utils.sleep(300000);
+            Utils.sleep(20000);
             cluster.killTopology("BookWordCountTopology");
 
             // we are done, so shutdown the local cluster

@@ -30,19 +30,19 @@
     <dependency>
         <groupId>com.twitter.heron</groupId>
         <artifactId>heron-api</artifactId>
-        <version>0.14.4</version>
+        <version>SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>com.twitter.heron</groupId>
       <artifactId>heron-spi</artifactId>
-      <version>0.14.4</version>
+      <version>SNAPSHOT</version>
     </dependency>
 
     <dependency>
         <groupId>com.twitter.heron</groupId>
         <artifactId>heron-storm</artifactId>
-        <version>0.14.4</version>
+        <version>SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -170,6 +170,14 @@
           <mainClass>${storm.topology}</mainClass>
         </configuration>
       </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <source>1.6</source>
+                <target>1.6</target>
+            </configuration>
+        </plugin>
 
     </plugins>
   </build>

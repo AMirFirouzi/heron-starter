@@ -48,44 +48,41 @@ public class ExclamationTopology {
     }
   }
 
-  public static class ReportBolt extends BaseRichBolt
-  {
+  public static class ReportBolt extends BaseRichBolt {
     PrintWriter writer;
     OutputCollector collector;
-    String compId,taskId;
+    String compId, taskId;
+
     @Override
     public void prepare(
-            Map map,
-            TopologyContext topologyContext,
-            OutputCollector         outputCollector)
-    {
+        Map map,
+        TopologyContext topologyContext,
+        OutputCollector outputCollector) {
       collector = outputCollector;
       compId = topologyContext.getThisComponentId();
-      taskId = topologyContext.getThisTaskId()+"";
-      try {
-        writer = new PrintWriter("/home/amir/Projects/output.txt", "UTF-8");
-      } catch (FileNotFoundException e) {
-        e.printStackTrace();
-      } catch (UnsupportedEncodingException e) {
-        e.printStackTrace();
-      }
+      taskId = topologyContext.getThisTaskId() + "";
+//      try {
+//        writer = new PrintWriter("/home/amir/Projects/output.txt", "UTF-8");
+//      } catch (FileNotFoundException e) {
+//        e.printStackTrace();
+//      } catch (UnsupportedEncodingException e) {
+//        e.printStackTrace();
+//      }
     }
 
     @Override
-    public void execute(Tuple tuple)
-    {
+    public void execute(Tuple tuple) {
 
       // access the first column 'word'
       String word = tuple.getStringByField("word");
 
       collector.ack(tuple);
 
-      System.out.println("component=>"+compId+"-"+taskId+" - word=>"+word);
-      writer.println("component=>"+compId+"-"+taskId+" - word=>"+word);
+      System.out.println("component=>" + compId + "-" + taskId + " - word=>" + word);
+//      writer.println("component=>"+compId+"-"+taskId+" - word=>"+word);
     }
 
-    public void declareOutputFields(OutputFieldsDeclarer declarer)
-    {
+    public void declareOutputFields(OutputFieldsDeclarer declarer) {
       // nothing to add - since it is the final bolt
     }
   }
@@ -93,19 +90,25 @@ public class ExclamationTopology {
   public static void main(String[] args) throws Exception {
     TopologyBuilder builder = new TopologyBuilder();
 
-    builder.setSpout("word", new TestWordSpout(), 10);
-    builder.setBolt("exclaim1", new ExclamationBolt(), 3).shuffleGrouping("word");
-    builder.setBolt("report", new ReportBolt(), 2).shuffleGrouping("exclaim1");
+    builder.setSpout("word", new TestWordSpout(), 2);
+    builder.setBolt("exclaim1", new ExclamationBolt(), 2).shuffleGrouping("word");
+    builder.setBolt("report", new ReportBolt(), 1).shuffleGrouping("exclaim1");
 
     Config conf = new Config();
     conf.setDebug(true);
+
+    conf.setDebug(true);
+    conf.setMaxSpoutPending(100);
+    conf.put(Config.TOPOLOGY_WORKER_CHILDOPTS, "-XX:+HeapDumpOnOutOfMemoryError");
+    conf.setComponentJvmOptions("word", "-agentlib:jdwp=transport=dt_socket,address=1239,server=y,suspend=n");
+    conf.setComponentJvmOptions("exclaim1", "-agentlib:jdwp=transport=dt_socket,address=8888,server=y,suspend=n");
+    conf.setComponentJvmOptions("report", "-agentlib:jdwp=transport=dt_socket,address=8888,server=y,suspend=n");
 
     if (args != null && args.length > 0) {
       conf.setNumWorkers(3);
 
       StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
-    }
-    else {
+    } else {
 
       LocalCluster cluster = new LocalCluster();
       cluster.submitTopology("test", conf, builder.createTopology());

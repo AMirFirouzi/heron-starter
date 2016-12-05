@@ -36,7 +36,7 @@ public class BookWordSpout extends BaseRichSpout {
     // save the output collector for emitting tuples
     collector = spoutOutputCollector;
 
-    String filename = "/home/amir/Projects/heron-starter/book.txt";
+    String filename = "/home/amir/Projects/heron/myheron/heron-starter/book.txt";
     try {
       file = new File(filename);
       this.fileReader = new FileReader(file);
